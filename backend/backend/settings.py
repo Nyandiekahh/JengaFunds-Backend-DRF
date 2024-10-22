@@ -182,13 +182,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For developm
 DEFAULT_FROM_EMAIL = 'noreply@jengafunds.com'
 
 # For production, use these settings:
-"""
+
 # Email settings for production
+# Email Configuration with Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'einsteinmokua100@gmail.com'
-EMAIL_HOST_PASSWORD = 'zfyt pnak naje ssnj'
-DEFAULT_FROM_EMAIL = 'einsteinmokua100@gmail.com'
-"""
+EMAIL_HOST_USER = 'einsteinmokua100@gmail.com'  # Your Gmail address
+EMAIL_HOST_PASSWORD = 'zfyt pnak naje ssnj'     # Your app password
+DEFAULT_FROM_EMAIL = 'Jenga Funds <einsteinmokua100@gmail.com>'
