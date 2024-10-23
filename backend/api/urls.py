@@ -4,7 +4,7 @@ from .views.dashboard_views import DashboardViewSet
 from .views.loan_views import LoanViewSet, LoanTypeViewSet
 from .views.transaction_views import TransactionViewSet
 from .views.auth_views import (
-    login, register, google_auth, verify_email,
+    login, register, verify_email,
     request_password_reset, reset_password,
     change_password, logout
 )
@@ -21,7 +21,6 @@ urlpatterns = router.urls + [
     path('auth/register/', register, name='register'),
     path('auth/login/', login, name='login'),
     path('auth/logout/', logout, name='logout'),
-    path('auth/google/', google_auth, name='google-auth'),
     path('auth/verify-email/', verify_email, name='verify-email'),
     path('auth/password-reset/', request_password_reset, name='password-reset-request'),
     path('auth/password-reset/confirm/', reset_password, name='password-reset-confirm'),

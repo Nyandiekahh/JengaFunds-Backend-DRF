@@ -10,8 +10,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 from ..models import UserProfile
 from ..serializers.user_serializer import UserSerializer
-from google.oauth2 import id_token
-from google.auth.transport import requests
 
 def send_verification_email(user, verification_url):
     html_message = f"""
@@ -98,7 +96,7 @@ def register(request):
             password=data['password'],
             first_name=data.get('first_name', ''),
             last_name=data.get('last_name', ''),
-            is_active=False
+            is_active=True  # Changed to True to allow immediate login
         )
         
         UserProfile.objects.create(user=user)
@@ -129,12 +127,6 @@ def login(request):
                 status=status.HTTP_401_UNAUTHORIZED
             )
             
-        if not user.is_active:
-            return Response(
-                {'error': 'Please verify your email first'}, 
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-            
         refresh = RefreshToken.for_user(user)
         return Response({
             'user': UserSerializer(user).data,
@@ -155,9 +147,6 @@ def verify_email(request):
         
         user = User.objects.get(id=user_id)
         if default_token_generator.check_token(user, token):
-            user.is_active = True
-            user.save()
-            
             refresh = RefreshToken.for_user(user)
             return Response({
                 'message': 'Email verified successfully',
@@ -193,7 +182,6 @@ def request_password_reset(request):
             'message': 'Password reset instructions sent to your email'
         })
     except User.DoesNotExist:
-        # Return success even if user doesn't exist (security best practice)
         return Response({
             'message': 'If an account exists with this email, you will receive password reset instructions.'
         })
@@ -220,45 +208,6 @@ def reset_password(request):
             {'error': 'User not found'}, 
             status=status.HTTP_404_NOT_FOUND
         )
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def google_auth(request):
-    try:
-        token = request.data.get('token')
-        idinfo = id_token.verify_oauth2_token(
-            token,
-            requests.Request(),
-            settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
-        )
-
-        email = idinfo['email']
-        first_name = idinfo.get('given_name', '')
-        last_name = idinfo.get('family_name', '')
-        
-        user, created = User.objects.get_or_create(
-            email=email,
-            defaults={
-                'username': email,
-                'first_name': first_name,
-                'last_name': last_name,
-                'is_active': True
-            }
-        )
-        
-        if created:
-            UserProfile.objects.create(user=user)
-        
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'user': UserSerializer(user).data,
-            'tokens': {
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-            }
-        })
-    except ValueError as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
