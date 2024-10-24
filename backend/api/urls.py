@@ -6,7 +6,7 @@ from .views.transaction_views import TransactionViewSet
 from .views.auth_views import (
     login, register, verify_email,
     request_password_reset, reset_password,
-    change_password, logout
+    change_password, logout, get_user_profile
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -26,4 +26,5 @@ urlpatterns = router.urls + [
     path('auth/password-reset/confirm/', reset_password, name='password-reset-confirm'),
     path('auth/change-password/', change_password, name='change-password'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/profile/', get_user_profile, name='user-profile'),
 ]

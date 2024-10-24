@@ -1,5 +1,10 @@
 from pathlib import Path
 from datetime import timedelta
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -113,8 +118,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # Google OAuth2 settings
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your-google-client-id'  # Add your Google Client ID
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your-google-client-secret'  # Add your Google Client Secret
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLE_OAUTH2_KEY', '')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH2_SECRET', '')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
@@ -162,6 +167,16 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
+# M-Pesa settings
+MPESA_CONFIG = {
+    'CONSUMER_KEY': os.getenv('MPESA_CONSUMER_KEY'),
+    'CONSUMER_SECRET': os.getenv('MPESA_CONSUMER_SECRET'),
+    'SHORTCODE': os.getenv('MPESA_SHORTCODE'),
+    'PASSKEY': os.getenv('MPESA_PASSKEY'),
+    'BASE_URL': os.getenv('BASE_URL', 'https://034a-105-163-156-173.ngrok-free.app'),
+    'SANDBOX_URL': 'https://sandbox.safaricom.co.ke',
+}
+
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -178,17 +193,10 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 
 # Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
-DEFAULT_FROM_EMAIL = 'noreply@jengafunds.com'
-
-# For production, use these settings:
-
-# Email settings for production
-# Email Configuration with Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'einsteinmokua100@gmail.com'  # Your Gmail address
-EMAIL_HOST_PASSWORD = 'zfyt pnak naje ssnj'     # Your app password
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'einsteinmokua100@gmail.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'zfyt pnak naje ssnj')
 DEFAULT_FROM_EMAIL = 'Jenga Funds <einsteinmokua100@gmail.com>'
