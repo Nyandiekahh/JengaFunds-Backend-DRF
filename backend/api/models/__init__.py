@@ -2,6 +2,8 @@ from .user_profile import UserProfile
 from .loan import Loan, LoanType
 from .transaction import Transaction
 from .auth_models import PhoneVerification, IDVerification, RegistrationProfile
+from .document import Document
+from .investment import LoanInvestment
 
 __all__ = [
     'UserProfile',
@@ -10,5 +12,7 @@ __all__ = [
     'Transaction',
     'PhoneVerification',
     'IDVerification',
-    'RegistrationProfile'
+    'RegistrationProfile',
+    'Document',
+    'LoanInvestment'
 ]

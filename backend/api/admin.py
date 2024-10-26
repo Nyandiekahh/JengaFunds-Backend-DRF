@@ -12,12 +12,35 @@ class UserProfileAdmin(admin.ModelAdmin):
 @admin.register(LoanType)
 class LoanTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'max_amount', 'interest_rate', 'term_months')
+    search_fields = ['name']
+    list_filter = ['term_months']
 
 @admin.register(Loan)
 class LoanAdmin(admin.ModelAdmin):
-    list_display = ('user', 'loan_type', 'amount', 'status', 'created_at')
-    list_filter = ('status', 'loan_type')
-    search_fields = ('user__username',)
+    list_display = (
+        'user', 
+        'loan_type', 
+        'amount', 
+        'status', 
+        'interest_rate',
+        'progress',
+        'risk_level',
+        'created_at'
+    )
+    list_filter = ('status', 'loan_type', 'risk_level')
+    search_fields = ('user__username', 'purpose', 'description')
+    readonly_fields = ('created_at', 'progress')
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('user', 'loan_type', 'amount', 'status', 'interest_rate', 'term_months')
+        }),
+        ('Loan Details', {
+            'fields': ('purpose', 'description', 'risk_level', 'progress')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at',)
+        }),
+    )
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
@@ -25,7 +48,6 @@ class TransactionAdmin(admin.ModelAdmin):
     list_filter = ('type', 'timestamp')
     search_fields = ('user__username', 'description')
 
-# Add the new model registrations
 @admin.register(PhoneVerification)
 class PhoneVerificationAdmin(admin.ModelAdmin):
     list_display = ('user', 'phone_number', 'is_verified', 'created_at')

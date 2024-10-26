@@ -124,7 +124,7 @@ def mpesa_callback(request):
         if result_code == 0:
             transaction.status = 'COMPLETED'
             # Create a regular transaction record
-            Transaction.objects.create(
+            transaction.objects.create(
                 user=transaction.user,
                 type='credit',
                 amount=transaction.amount,
