@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from decimal import Decimal
 from .loan import Loan
 
 class LoanInvestment(models.Model):
@@ -31,20 +32,48 @@ class LoanInvestment(models.Model):
         return f"{self.investor.username}'s investment of {self.amount} in loan #{self.loan.id}"
 
     def save(self, *args, **kwargs):
-        is_new = self._state.adding  # Check if this is a new instance
+        is_new = self._state.adding
         super().save(*args, **kwargs)
         
         if is_new or self.status == 'completed':
             # Update loan progress and status
             total_invested = self.loan.investments.filter(
                 status='completed'
-            ).aggregate(models.Sum('amount'))['amount__sum'] or 0
+            ).aggregate(models.Sum('amount'))['amount__sum'] or Decimal('0')
             
-            self.loan.progress = (total_invested / float(self.loan.amount)) * 100
+            # Convert to Decimal for calculation
+            loan_amount = self.loan.amount
+            if total_invested and loan_amount:
+                progress = (total_invested / loan_amount * Decimal('100')).quantize(Decimal('0.01'))
+            else:
+                progress = Decimal('0.00')
             
-            if self.loan.progress >= 100:
+            self.loan.progress = progress
+            
+            # Update loan status based on progress
+            if progress >= Decimal('100.00'):
                 self.loan.status = 'Funded'
-            elif self.loan.progress > 0:
+            elif progress > Decimal('0.00'):
                 self.loan.status = 'Funding'
-                
+            
             self.loan.save()
+
+    @property
+    def return_amount(self):
+        """Calculate the expected return amount including interest"""
+        if self.status != 'completed' or not self.loan.interest_rate:
+            return Decimal('0.00')
+        
+        interest_rate = self.loan.interest_rate / Decimal('100')
+        term_years = Decimal(str(self.loan.term_months)) / Decimal('12')
+        return self.amount + (self.amount * interest_rate * term_years)
+
+    @property
+    def return_rate(self):
+        """Get the return rate for this investment"""
+        return self.loan.interest_rate if self.loan else Decimal('0.00')
+
+    @property
+    def is_active(self):
+        """Check if investment is active"""
+        return self.status == 'completed' and self.loan.status in ['Funding', 'Funded']

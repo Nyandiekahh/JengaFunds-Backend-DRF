@@ -1,3 +1,16 @@
+# api/serializers/dashboard_serializer.py
+from rest_framework import serializers
+
+class StatItemSerializer(serializers.Serializer):
+    value = serializers.CharField()
+    change = serializers.CharField()
+
+class DashboardStatsSerializer(serializers.Serializer):
+    total_invested = StatItemSerializer()
+    total_borrowed = StatItemSerializer()
+    active_investments = StatItemSerializer()
+    avg_return_rate = StatItemSerializer()
+
 # api/views/dashboard_views.py
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -56,38 +69,24 @@ class DashboardViewSet(viewsets.ViewSet):
         avg_return_rate = (total_return_rate / investment_count) if investment_count > 0 else Decimal('0')
 
         # Calculate changes (you'll need to implement your own logic for historical comparison)
-        # This is a simplified example
         stats = {
             'total_invested': {
                 'value': f"KES {total_invested:,.2f}",
-                'change': '+5.2%'  # You should calculate this based on historical data
+                'change': '+5.2%'  # Replace with actual calculation
             },
             'total_borrowed': {
                 'value': f"KES {total_borrowed:,.2f}",
-                'change': '-2.1%'  # You should calculate this based on historical data
+                'change': '-2.1%'  # Replace with actual calculation
             },
             'active_investments': {
                 'value': str(active_investments),
-                'change': '+1'  # You should calculate this based on historical data
+                'change': '+1'  # Replace with actual calculation
             },
             'avg_return_rate': {
                 'value': f"{avg_return_rate:.1f}%",
-                'change': '+0.3%'  # You should calculate this based on historical data
+                'change': '+0.3%'  # Replace with actual calculation
             }
         }
         
         serializer = DashboardStatsSerializer(stats)
         return Response(serializer.data)
-
-# api/serializers/dashboard_serializer.py
-from rest_framework import serializers
-
-class StatItemSerializer(serializers.Serializer):
-    value = serializers.CharField()
-    change = serializers.CharField()
-
-class DashboardStatsSerializer(serializers.Serializer):
-    total_invested = StatItemSerializer()
-    total_borrowed = StatItemSerializer()
-    active_investments = StatItemSerializer()
-    avg_return_rate = StatItemSerializer()
